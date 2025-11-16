@@ -27,7 +27,7 @@ export const updateKYCStatus = async (
   status: "PENDING" | "VERIFIED" | "REJECTED"
 ) => {
   return prisma.user.update({
-    where: { id: userId },
+    where: { id: Number(userId) },
     data: { kycStatus: status },
   });
 };
@@ -50,14 +50,14 @@ export const verifyEmail = async (email: string) => {
 // Update phone OTP & verification
 export const setPhoneOTP = async (userId: number, otp: string) => {
   return prisma.user.update({
-    where: { id: userId },
+    where: { id: Number(userId) },
     data: { phoneOTP: otp },
   });
 };
 
 export const verifyPhone = async (userId: number) => {
   return prisma.user.update({
-    where: { id: userId },
+    where: { id: Number(userId) },
     data: { phoneVerified: true, phoneOTP: null },
   });
 };

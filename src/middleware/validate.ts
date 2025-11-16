@@ -1,5 +1,6 @@
 // src/middleware/validators.ts
-import { body, validationResult } from "express-validator";
+const expressValidator = require("express-validator");
+const { body, validationResult } = expressValidator;
 import { Request, Response, NextFunction } from "express";
 
 // -----------------------
@@ -77,7 +78,10 @@ export const verifyPhoneOTPValidationRules = [
 export const validate = (req: Request, res: Response, next: NextFunction) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array().map(err => err.msg) });
+    return res.status(400).json({
+      errors: errors.array().map((err: { msg: string }) => err.msg)
+    });
   }
   next();
 };
+
