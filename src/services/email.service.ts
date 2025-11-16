@@ -16,3 +16,4 @@ export async function sendEmailOTP(to: string, otp: string) {
     html: `<h2>Your OTP Code is: <b>${otp}</b></h2>`,
   });
 }
+ 
