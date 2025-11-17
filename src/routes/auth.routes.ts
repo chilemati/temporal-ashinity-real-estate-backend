@@ -288,8 +288,8 @@ router.patch(
         } catch {}
       }
 
-      if (req.file) {
-        bodyParsed.image = req.file;
+      if (req?.file) {
+        bodyParsed.image = req?.file;
       }
 
       return res.json({
