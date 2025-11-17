@@ -11,11 +11,12 @@ const app = express();
 // Middlewares
 app.use(cors(
   {
-  origin:["https://ashinity-real-estate-frontend-web.vercel.app", "*" ], 
-  methods: "GET,POST,PUT,DELETE",
+  origin:["https://ashinity-real-estate-frontend-web.vercel.app","http://localhost:5173", "*" ], 
+  methods: "GET,POST,PUT,DELETE,PATCH",
 }
 ));
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));  // <-- REQUIRED FOR FORMDATA
 app.use(passport.initialize());
 
 // Routes
