@@ -1,12 +1,9 @@
-// src/middleware/validators.ts
-const expressValidator = require("express-validator");
-const { body, validationResult } = expressValidator;
+import { body, ValidationError, validationResult } from "express-validator";
 import { Request, Response, NextFunction } from "express";
 
 // -----------------------
 // Validation Rules
 // -----------------------
-
 export const registerValidationRules = [
   body("email")
     .exists({ checkFalsy: true }).withMessage("Email is required")
@@ -73,15 +70,14 @@ export const verifyPhoneOTPValidationRules = [
 ];
 
 // -----------------------
-// Middleware to check validation results
+// Validation Result Middleware
 // -----------------------
 export const validate = (req: Request, res: Response, next: NextFunction) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
-      errors: errors.array().map((err: { msg: string }) => err.msg)
+      errors: errors.array().map((err: ValidationError) => err.msg),
     });
   }
   next();
 };
-

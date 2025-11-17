@@ -5,8 +5,20 @@ import { generateOTP, otpExpiry } from "../utils/otp";
 import { sendEmailOTP } from "./email.service";
 import { sendSMSOTP } from "./sms.service";
 
+// Define interfaces for expected input data
+interface RegisterUserData {
+  email: string;
+  fullname: string;
+  password: string;
+}
+
+interface LoginUserData {
+  email: string;
+  password: string;
+}
+
 // REGISTER USER
-export async function register(data: any) {
+export async function register(data: RegisterUserData) {
   const exists = await prisma.user.findUnique({ where: { email: data.email }});
   if (exists) throw new Error("Email already registered");
 
@@ -35,7 +47,7 @@ export async function register(data: any) {
 
 
 // LOGIN USER
-export async function login(data: any) {
+export async function login(data: LoginUserData) {
   const user = await prisma.user.findUnique({ where: { email: data.email }});
   if (!user) throw new Error("Invalid credentials");
 
