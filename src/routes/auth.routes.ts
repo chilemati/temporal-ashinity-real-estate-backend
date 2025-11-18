@@ -11,9 +11,7 @@ import {
   verifyPhoneOTPValidationRules,
   validate
 } from "../middleware/validate";
-import multer from "multer";
 
-const upload = multer({ storage: multer.memoryStorage() });
 
 
 const router = express.Router();
@@ -268,44 +266,6 @@ router.post("/verify-phone-otp", verifyPhoneOTPValidationRules, validate, auth.v
 
 
 
-
-router.patch(
-  "/update-user-profile/:id",
-  upload.single("image"),   // <-- THIS IS THE FIX
-  async (req: Request, res: Response) => {
-    try {
-      const bodyRaw = { ...req.body };
-      const bodyParsed: any = { ...req.body };
-
-      if (typeof bodyParsed.address === "string") {
-        try {
-          bodyParsed.address = JSON.parse(bodyParsed.address);
-        } catch {}
-      }
-
-      if (typeof bodyParsed.skills === "string") {
-        try {
-          bodyParsed.skills = JSON.parse(bodyParsed.skills);
-        } catch {}
-      }
-
-      if (req?.file) {
-        bodyParsed.image = req?.file;
-      }
-
-      return res.json({
-        success: false,
-        message: "Received data from frontend",
-        body: bodyParsed,
-      });
-    } catch (error: any) {
-      return res.status(500).json({
-        success: false,
-        message: error.message,
-      });
-    }
-  }
-);
 
 
 

@@ -82,7 +82,8 @@ export async function verifyEmailOTP(email: string, otp: string) {
 
 
 // FORGOT PASSWORD → SEND OTP
-export async function forgotPassword(email: string) {
+// SERVICE FUNCTION
+export async function handleForgotPassword(email: string) {
   const user = await prisma.user.findUnique({ where: { email }});
   if (!user) throw new Error("User not found");
 
@@ -96,11 +97,11 @@ export async function forgotPassword(email: string) {
     }
   });
 
-  // SEND RESET OTP EMAIL
   await sendEmailOTP(email, otp);
 
   return true;
 }
+
 
 
 // RESET PASSWORD

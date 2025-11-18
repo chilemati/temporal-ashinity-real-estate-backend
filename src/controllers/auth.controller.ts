@@ -4,7 +4,7 @@ import * as auth from "../services/auth.service";
 export async function register(req: Request, res: Response) {
   try {
     const user = await auth.register(req.body);
-    res.json({ success: true, message: "OTP sent to email", user });
+    res.json({ success: true, message: "OTP sent to email", user:{fullname:user.user.fullname,email:user.user.email, id: user.user.id,emailVerified:user.user.emailVerified, phoneVerified:user.user.phoneVerified} });
   } catch (err: unknown) {
    // Safely check if the caught error is an instance of the native Error class
     if (err instanceof Error) {
@@ -19,7 +19,7 @@ export async function register(req: Request, res: Response) {
 export async function verifyEmail(req: Request, res: Response) {
   try {
     const user = await auth.verifyEmailOTP(req.body.email, req.body.otp);
-    res.json({ success: true, message: "Email verified", user });
+    res.json({ success: true, message: "Email verified", user:{fullname:user.fullname,email:user.email, id: user.id,emailVerified:user.emailVerified, phoneVerified:user.phoneVerified} });
   } catch (err: unknown) {
    // Safely check if the caught error is an instance of the native Error class
     if (err instanceof Error) {
@@ -34,7 +34,7 @@ export async function verifyEmail(req: Request, res: Response) {
 export async function login(req: Request, res: Response) {
   try {
     const data = await auth.login(req.body);
-    res.json({ success: true, ...data });
+    res.json({ success: true, user:{fullname:data.user.fullname,email:data.user.email, id: data.user.id,emailVerified:data.user.emailVerified, phoneVerified:data.user.phoneVerified,token:data.token} });
   }catch (err: unknown) {
    // Safely check if the caught error is an instance of the native Error class
     if (err instanceof Error) {
@@ -48,7 +48,7 @@ export async function login(req: Request, res: Response) {
 
 export async function forgotPassword(req: Request, res: Response) {
   try {
-    await auth.forgotPassword(req.body.email);
+    await auth.handleForgotPassword(req.body.email);
     res.json({ success: true, message: "OTP sent to email" });
   } catch (err: unknown) {
    // Safely check if the caught error is an instance of the native Error class
@@ -68,7 +68,7 @@ export async function resetPassword(req: Request, res: Response) {
       req.body.otp,
       req.body.newPassword
     );
-    res.json({ success: true, message: "Password reset successful", user });
+    res.json({ success: true, message: "Password reset successful", user:{fullname:user.fullname,email:user.email, id: user.id,emailVerified:user.emailVerified, phoneVerified:user.phoneVerified} });
   } catch (err: unknown) {
    // Safely check if the caught error is an instance of the native Error class
     if (err instanceof Error) {
