@@ -12,7 +12,8 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "tables": "npx prisma studio",
-    "docs": "postgrest postgrest.conf"
+    "docs": "postgrest postgrest.conf",
+    "postinstall": "npx prisma generate" 
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",

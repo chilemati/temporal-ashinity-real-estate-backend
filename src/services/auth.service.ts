@@ -97,9 +97,15 @@ export async function handleForgotPassword(email: string) {
     }
   });
 
-  await sendEmailOTP(email, otp);
+    try {
+        await sendEmailOTP(email, otp);
+        console.log(`Email sent successfully to ${email}`);
+    } catch (emailError) {
+        console.error("FAILED TO SEND EMAIL OTP:", emailError); // THIS LOG IS KEY
+        throw new Error("Failed to send verification email. Please try again later.");
+    }
+    return true;
 
-  return true;
 }
 
 
