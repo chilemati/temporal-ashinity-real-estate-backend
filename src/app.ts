@@ -11,7 +11,7 @@ const app = express();
 // Middlewares
 app.use(cors(
   {
-  origin:["https://ashinity-real-estate-frontend-web.vercel.app","http://localhost:5173", "*" ], 
+  origin:["https://ashinity-real-estate-frontend-web.vercel.app","http://localhost:5173","http://localhost:3000", "*" ], 
   methods: "GET,POST,PUT,DELETE,PATCH",
 }
 ));
