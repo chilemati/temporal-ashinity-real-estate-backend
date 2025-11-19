@@ -1,5 +1,7 @@
 import express, { Request, Response } from "express";
 import * as auth from "../controllers/auth.controller";
+import axios from "axios";
+
 import {
   registerValidationRules,
   loginValidationRules,
@@ -262,6 +264,44 @@ router.post("/send-phone-otp", phoneOTPValidationRules, validate, auth.sendPhone
  */
 
 router.post("/verify-phone-otp", verifyPhoneOTPValidationRules, validate, auth.verifyPhoneOTP);
+
+
+
+router.post("/send-email", async (req: Request, res: Response) => {
+  try {
+    const { from, to, subject, html } = req.body;
+
+    // Validate
+    if (!from || !to || !subject || !html) {
+      return res.status(400).json({
+        success: false,
+        message: "from, to, subject, and html are required",
+      });
+    }
+
+    // Forward request to your mailer API
+    const response = await axios.post(
+      "https://chilesmailer.vercel.app/api/sendMail/email",
+      { from, to, subject, html }
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Email sent successfully",
+      data: response.data, // response from your mail service
+    });
+  } catch (error: any) {
+    console.error("Email error:", error.response?.data || error.message);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to send email",
+      error: error.response?.data || error.message,
+    });
+  }
+});
+
+
 
 
 
