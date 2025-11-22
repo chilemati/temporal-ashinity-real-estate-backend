@@ -11,7 +11,8 @@ import {
   googleLoginValidationRules,
   phoneOTPValidationRules,
   verifyPhoneOTPValidationRules,
-  validate
+  validate,
+  updateProfileValidationRules
 } from "../middleware/validate";
 import { generateOTP } from "../utils/otp";
 import { sendEmailOTP } from "../services/email.service";
@@ -266,6 +267,9 @@ router.post("/send-phone-otp", phoneOTPValidationRules, validate, auth.sendPhone
  */
 
 router.post("/verify-phone-otp", verifyPhoneOTPValidationRules, validate, auth.verifyPhoneOTP);
+router.patch("/update-profile", updateProfileValidationRules ,validate,auth.updateProfile);
+router.post("/resend-email-otp",updateProfileValidationRules ,validate, auth.resendOTPController);
+
 
 
 

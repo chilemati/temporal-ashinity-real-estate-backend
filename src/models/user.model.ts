@@ -12,7 +12,11 @@ export const findUserByEmail = async (email: string) => {
 // Create a new user (email/password)
 export const createUser = async (data: {
   email: string;
-  fullname?: string;
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
+  nin?: string;
+  avatar?: string;
   password?: string; // optional for Google users
   googleId?: string;
 }) => {

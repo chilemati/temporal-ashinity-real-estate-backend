@@ -11,25 +11,29 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        // Check if user exists
         let user = await prisma.user.findUnique({
           where: { googleId: profile.id },
         });
 
-        // If not found, create new user
         if (!user) {
+          const parts = profile.displayName?.split(" ") || [];
+          const firstName = parts[0] || null;
+          const lastName = parts.slice(1).join(" ") || null;
+
           user = await prisma.user.create({
             data: {
               googleId: profile.id,
               email: profile.emails?.[0].value!,
-              name: profile.displayName,
+              firstName,
+              lastName,
+              avatar: profile.photos?.[0]?.value || null,
             },
           });
         }
 
-        return done(null, user); // ✅ OK
+        return done(null, user);
       } catch (err) {
-        return done(err, false); // ✅ TS-safe: use `false` instead of null
+        return done(err, false);
       }
     }
   )

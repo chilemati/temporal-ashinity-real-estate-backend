@@ -20,17 +20,24 @@ generator client {
 model User {
   id            Int       @id @default(autoincrement())
   email         String    @unique
-  fullname      String?   // optional for normal users
-  password      String?   // nullable for Google users
-  name          String?   // optional Google display name
-  googleId      String?   @unique // store Google profile ID
-  kycStatus     String?   // PENDING | VERIFIED | REJECTED
-  emailVerified Boolean   @default(false)
   phone         String?   @unique
+  password      String?
+  firstName     String?
+  lastName      String?
+  nin           String?
+  avatar        String?
+  googleId      String?   @unique
+  kycStatus     String?   @default("PENDING")
+
+  emailVerified Boolean   @default(false)
   phoneVerified Boolean   @default(false)
+
   emailOTP      String?
   phoneOTP      String?
   otpExpiresAt  DateTime?
+
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 }
+
+
