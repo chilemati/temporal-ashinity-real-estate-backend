@@ -8,10 +8,10 @@ export async function register(req: Request, res: Response) {
   } catch (err: unknown) {
    // Safely check if the caught error is an instance of the native Error class
     if (err instanceof Error) {
-      res.status(400).json({ error: "An error occured,pleae try again" });
+      res.status(400).json({ error: err });
     } else {
       // Handle cases where the error is not a standard Error object (e.g., a thrown string or number)
-      res.status(400).json({ error: "An unknown error occurred" });
+      res.status(400).json({ error: err });
     }
   }
 }
@@ -45,10 +45,10 @@ export async function verifyEmail(req: Request, res: Response) {
   } catch (err: unknown) {
    // Safely check if the caught error is an instance of the native Error class
     if (err instanceof Error) {
-      res.status(400).json({ error: "An error occured,pleae try again" });
+      res.status(400).json({ error: err });
     } else {
       // Handle cases where the error is not a standard Error object (e.g., a thrown string or number)
-      res.status(400).json({ error: "An unknown error occurred" });
+      res.status(400).json({ error: err });
     }
   }
 }
@@ -61,10 +61,10 @@ export async function login(req: Request, res: Response) {
   }catch (err: unknown) {
    // Safely check if the caught error is an instance of the native Error class
     if (err instanceof Error) {
-      res.status(400).json({ error: "An error occured,pleae try again" });
+      res.status(400).json({ error: err });
     } else {
       // Handle cases where the error is not a standard Error object (e.g., a thrown string or number)
-      res.status(400).json({ error: "An unknown error occurred" });
+      res.status(400).json({ error: err });
     }
   }
 }
@@ -76,10 +76,10 @@ export async function forgotPassword(req: Request, res: Response) {
   } catch (err: unknown) {
    // Safely check if the caught error is an instance of the native Error class
     if (err instanceof Error) {
-      res.status(400).json({ error: "An error occured,pleae try again" });
+      res.status(400).json({ error: err });
     } else {
       // Handle cases where the error is not a standard Error object (e.g., a thrown string or number)
-      res.status(400).json({ error: "An unknown error occurred" });
+      res.status(400).json({ error: err });
     }
   }
 }
@@ -95,10 +95,10 @@ export async function resetPassword(req: Request, res: Response) {
   } catch (err: unknown) {
    // Safely check if the caught error is an instance of the native Error class
     if (err instanceof Error) {
-      res.status(400).json({ error: "An error occured,pleae try again" });
+      res.status(400).json({ error: err });
     } else {
       // Handle cases where the error is not a standard Error object (e.g., a thrown string or number)
-      res.status(400).json({ error: "An unknown error occurred" });
+      res.status(400).json({ error: err });
     }
   }
 }
@@ -114,10 +114,10 @@ export async function googleLogin(req: Request, res: Response) {
   } catch (err: unknown) {
    // Safely check if the caught error is an instance of the native Error class
     if (err instanceof Error) {
-      res.status(400).json({ error: "An error occured,pleae try again" });
+      res.status(400).json({ error: err });
     } else {
       // Handle cases where the error is not a standard Error object (e.g., a thrown string or number)
-      res.status(400).json({ error: "An unknown error occurred" });
+      res.status(400).json({ error: err });
     }
   }
 }
@@ -129,10 +129,10 @@ export async function sendPhoneOTP(req: Request, res: Response) {
   } catch (err: unknown) {
    // Safely check if the caught error is an instance of the native Error class
     if (err instanceof Error) {
-      res.status(400).json({ error: "An error occured,pleae try again" });
+      res.status(400).json({ error: err });
     } else {
       // Handle cases where the error is not a standard Error object (e.g., a thrown string or number)
-      res.status(400).json({ error: "An unknown error occurred" });
+      res.status(400).json({ error: err });
     }
   }
 }
@@ -144,10 +144,10 @@ export async function verifyPhoneOTP(req: Request, res: Response) {
   } catch (err: unknown) {
    // Safely check if the caught error is an instance of the native Error class
     if (err instanceof Error) {
-      res.status(400).json({ error: "An error occured,pleae try again" });
+      res.status(400).json({ error: err });
     } else {
       // Handle cases where the error is not a standard Error object (e.g., a thrown string or number)
-      res.status(400).json({ error: "An unknown error occurred" });
+      res.status(400).json({ error: err });
     }
   }
 }
@@ -181,9 +181,9 @@ export async function updateProfile(req: Request, res: Response) {
 
   } catch (err: unknown) {
     if (err instanceof Error) {
-      return res.status(400).json({ error: "An error occured,pleae try again",message:err });
+      return res.status(400).json({ error: err });
     } else {
-      return res.status(400).json({ error: "An unknown error occurred" });
+      return res.status(400).json({ error: err });
     }
   }
 }
