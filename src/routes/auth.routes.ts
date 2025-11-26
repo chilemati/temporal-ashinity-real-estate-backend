@@ -21,14 +21,14 @@ import { sendEmailOTP } from "../services/email.service";
 
 const router = express.Router();
 
-
- /**
+/**
  * @openapi
  * /auth/register:
  *   post:
  *     tags:
  *       - Auth
  *     summary: Register a new user and send OTP to email
+ *     description: Creates a new user using only email. Sends OTP for verification. No password is required during registration.
  *     requestBody:
  *       required: true
  *       content:
@@ -37,23 +37,47 @@ const router = express.Router();
  *             type: object
  *             required:
  *               - email
- *               - password
- *               - fullname
  *             properties:
  *               email:
  *                 type: string
- *               password:
- *                 type: string
- *               fullname:
- *                 type: string
+ *                 example: "user@example.com"
  *     responses:
  *       200:
  *         description: OTP sent to email
  *       400:
- *         description: Email already registered or validation error
+ *         description: Email already registered or invalid input
  */
-
 router.post("/register", registerValidationRules, validate, auth.register);
+
+
+/**
+ * @openapi
+ * /auth/resend-otp:
+ *   post:
+ *     tags:
+ *       - Auth
+ *     summary: Resend email OTP
+ *     description: Sends a new OTP if the old one has expired. If OTP is still valid, user must wait.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: "user@example.com"
+ *     responses:
+ *       200:
+ *         description: OTP resent successfully
+ *       400:
+ *         description: User not found or OTP still valid
+ */
+router.post("/resend-otp", auth.resendOTPController);
+
 
 /**
  * @openapi
@@ -61,7 +85,10 @@ router.post("/register", registerValidationRules, validate, auth.register);
  *   post:
  *     tags:
  *       - Auth
- *     summary: Login a user and return authentication token
+ *     summary: OTP based login with email
+ *     description: 
+ *       - If password is included → performs password login  
+ *       - If password is omitted → sends OTP to email for login  
  *     requestBody:
  *       required: true
  *       content:
@@ -70,20 +97,17 @@ router.post("/register", registerValidationRules, validate, auth.register);
  *             type: object
  *             required:
  *               - email
- *               - password
  *             properties:
  *               email:
  *                 type: string
- *               password:
- *                 type: string
  *     responses:
  *       200:
- *         description: Logged in successfully, returns JWT token and user data
+ *         description: Login successful or OTP sent
  *       400:
- *         description: Invalid credentials or email not verified
+ *         description: Invalid credentials
  */
-
 router.post("/login", loginValidationRules, validate, auth.login);
+
 
 /**
  * @openapi
@@ -91,7 +115,8 @@ router.post("/login", loginValidationRules, validate, auth.login);
  *   post:
  *     tags:
  *       - Auth
- *     summary: Verify user email using OTP sent to email
+ *     summary: Verify email using OTP
+ *     description: Confirms user's email during registration or OTP login.
  *     requestBody:
  *       required: true
  *       content:
@@ -112,8 +137,8 @@ router.post("/login", loginValidationRules, validate, auth.login);
  *       400:
  *         description: Invalid or expired OTP
  */
-
 router.post("/verify-email", verifyEmailValidationRules, validate, auth.verifyEmail);
+
 
 /**
  * @openapi
@@ -121,7 +146,8 @@ router.post("/verify-email", verifyEmailValidationRules, validate, auth.verifyEm
  *   post:
  *     tags:
  *       - Auth
- *     summary: Send OTP to email for password reset
+ *     summary: Send OTP for password reset
+ *     description: This works only for accounts created with a password. OTP-only accounts cannot reset passwords.
  *     requestBody:
  *       required: true
  *       content:
@@ -135,12 +161,12 @@ router.post("/verify-email", verifyEmailValidationRules, validate, auth.verifyEm
  *                 type: string
  *     responses:
  *       200:
- *         description: OTP sent to email
+ *         description: OTP sent successfully
  *       400:
- *         description: User not found
+ *         description: User not found or account uses OTP-only login
  */
-
 router.post("/forgot-password", forgotPasswordValidationRules, validate, auth.forgotPassword);
+
 
 /**
  * @openapi
@@ -148,7 +174,7 @@ router.post("/forgot-password", forgotPasswordValidationRules, validate, auth.fo
  *   post:
  *     tags:
  *       - Auth
- *     summary: Reset password using OTP sent to email
+ *     summary: Reset password using OTP
  *     requestBody:
  *       required: true
  *       content:
@@ -168,12 +194,12 @@ router.post("/forgot-password", forgotPasswordValidationRules, validate, auth.fo
  *                 type: string
  *     responses:
  *       200:
- *         description: Password reset successfully
+ *         description: Password reset successful
  *       400:
  *         description: Invalid or expired OTP
  */
-
 router.post("/reset-password", resetPasswordValidationRules, validate, auth.resetPassword);
+
 
 /**
  * @openapi
@@ -181,7 +207,8 @@ router.post("/reset-password", resetPasswordValidationRules, validate, auth.rese
  *   post:
  *     tags:
  *       - Auth
- *     summary: Login or register a user using Google OAuth
+ *     summary: Login or register using Google
+ *     description: Logs user in with Google or creates a new verified account if email doesn't exist.
  *     requestBody:
  *       required: true
  *       content:
@@ -201,12 +228,12 @@ router.post("/reset-password", resetPasswordValidationRules, validate, auth.rese
  *                 type: string
  *     responses:
  *       200:
- *         description: Authentication successful
+ *         description: Google login successful
  *       400:
- *         description: Google login failed
+ *         description: Error logging in with Google
  */
-
 router.post("/google-login", googleLoginValidationRules, validate, auth.googleLogin);
+
 
 /**
  * @openapi
@@ -214,7 +241,8 @@ router.post("/google-login", googleLoginValidationRules, validate, auth.googleLo
  *   post:
  *     tags:
  *       - Auth
- *     summary: Send OTP to user's phone number for verification
+ *     summary: Send OTP to phone
+ *     description: Updates phone number and sends SMS OTP.
  *     requestBody:
  *       required: true
  *       content:
@@ -233,10 +261,10 @@ router.post("/google-login", googleLoginValidationRules, validate, auth.googleLo
  *       200:
  *         description: OTP sent to phone
  *       400:
- *         description: Invalid phone or user not found
+ *         description: Failed to send OTP
  */
-
 router.post("/send-phone-otp", phoneOTPValidationRules, validate, auth.sendPhoneOTP);
+
 
 /**
  * @openapi
@@ -244,7 +272,8 @@ router.post("/send-phone-otp", phoneOTPValidationRules, validate, auth.sendPhone
  *   post:
  *     tags:
  *       - Auth
- *     summary: Verify phone number with OTP sent via SMS
+ *     summary: Verify phone OTP
+ *     description: Confirms and marks phone number as verified.
  *     requestBody:
  *       required: true
  *       content:
@@ -265,10 +294,47 @@ router.post("/send-phone-otp", phoneOTPValidationRules, validate, auth.sendPhone
  *       400:
  *         description: Invalid or expired OTP
  */
-
 router.post("/verify-phone-otp", verifyPhoneOTPValidationRules, validate, auth.verifyPhoneOTP);
-router.patch("/update-profile", updateProfileValidationRules ,validate,auth.updateProfile);
-router.post("/resend-email-otp",updateProfileValidationRules ,validate, auth.resendOTPController);
+
+
+/**
+ * @openapi
+ * /auth/update-profile:
+ *   put:
+ *     tags:
+ *       - Auth
+ *     summary: Update user profile
+ *     description: Updates firstName, lastName, phone, NIN, and avatar (base64 image uploaded to Cloudinary).
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *             properties:
+ *               email:
+ *                 type: string
+ *               firstName:
+ *                 type: string
+ *               lastName:
+ *                 type: string
+ *               phone:
+ *                 type: string
+ *               nin:
+ *                 type: string
+ *               avatar:
+ *                 type: string
+ *                 description: Base64 encoded image
+ *     responses:
+ *       200:
+ *         description: Profile updated successfully
+ *       400:
+ *         description: User not found or invalid data
+ */
+router.put("/update-profile", updateProfileValidationRules, validate, auth.updateProfile);
+
 
 
 
@@ -305,6 +371,7 @@ router.post("/send-email", async (req: Request, res: Response) => {
     });
   }
 });
+
 
 
 
