@@ -1,6 +1,9 @@
 import { Request, Response } from "express";
 import * as auth from "../services/auth.service";
-import { toErrorString } from "../utils/err";
+import { prismaErrorHandler } from "../utils/prisimErrorHandler";
+import prisma from "../prismaClient";
+
+
 
 export async function register(req: Request, res: Response) {
   try {
@@ -9,10 +12,33 @@ export async function register(req: Request, res: Response) {
   } catch (err: unknown) {
    // Safely check if the caught error is an instance of the native Error class
     if (err instanceof Error) {
-      return res.status(400).json({ error: toErrorString(err) });
+      return res.status(400).json({ error: prismaErrorHandler(err) });
     } else {
       // Handle cases where the error is not a standard Error object (e.g., a thrown string or number)
-      return res.status(400).json({ error: toErrorString(err) });
+      return res.status(400).json({ error: prismaErrorHandler(err) });
+    }
+  }
+}
+export async function emailPhoneAvailability(req: Request, res: Response) {
+  const {email,phone} = req.body;
+    if(!email || !phone) res.json({error: "Email or phone required"});
+
+  try {
+      const exists = await prisma.user.findUnique({ where: { email: email }});
+      if (exists) throw new Error("Email already registered");
+      if(phone) {
+        const existsPhone = await prisma.user.findUnique({ where: { phone: phone }});
+        if (existsPhone) throw new Error("Phone number used by another user");
+    
+      }
+      return res.status(200).json({success: true, message: "Email and phone number available"})
+  } catch (err: unknown) {
+   // Safely check if the caught error is an instance of the native Error class
+    if (err instanceof Error) {
+      return res.status(400).json({ error: prismaErrorHandler(err) });
+    } else {
+      // Handle cases where the error is not a standard Error object (e.g., a thrown string or number)
+      return res.status(400).json({ error: prismaErrorHandler(err) });
     }
   }
 }
@@ -34,7 +60,7 @@ export async function resendOTPController(req: Request, res: Response) {
     });
 
   } catch (err: any) {
-    return res.status(400).json({ error: "Failed to send OTP" });
+    return res.status(400).json({ error: err.message });
   }
 }
 
@@ -46,10 +72,10 @@ export async function verifyEmail(req: Request, res: Response) {
   } catch (err: unknown) {
    // Safely check if the caught error is an instance of the native Error class
     if (err instanceof Error) {
-      return res.status(400).json({ error: toErrorString(err) });
+      return res.status(400).json({ error: prismaErrorHandler(err) });
     } else {
       // Handle cases where the error is not a standard Error object (e.g., a thrown string or number)
-      return res.status(400).json({ error: toErrorString(err) });
+      return res.status(400).json({ error: prismaErrorHandler(err) });
     }
   }
 }
@@ -62,10 +88,10 @@ export async function login(req: Request, res: Response) {
   }catch (err: unknown) {
    // Safely check if the caught error is an instance of the native Error class
     if (err instanceof Error) {
-      return res.status(400).json({ error: toErrorString(err) });
+      return res.status(400).json({ error: prismaErrorHandler(err) });
     } else {
       // Handle cases where the error is not a standard Error object (e.g., a thrown string or number)
-      return res.status(400).json({ error: toErrorString(err) });
+      return res.status(400).json({ error: prismaErrorHandler(err) });
     }
   }
 }
@@ -77,10 +103,10 @@ export async function forgotPassword(req: Request, res: Response) {
   } catch (err: unknown) {
    // Safely check if the caught error is an instance of the native Error class
     if (err instanceof Error) {
-      return res.status(400).json({ error: toErrorString(err) });
+      return res.status(400).json({ error: prismaErrorHandler(err) });
     } else {
       // Handle cases where the error is not a standard Error object (e.g., a thrown string or number)
-      return res.status(400).json({ error: toErrorString(err) });
+      return res.status(400).json({ error: prismaErrorHandler(err) });
     }
   }
 }
@@ -96,10 +122,10 @@ export async function resetPassword(req: Request, res: Response) {
   } catch (err: unknown) {
    // Safely check if the caught error is an instance of the native Error class
     if (err instanceof Error) {
-      return res.status(400).json({ error: toErrorString(err) });
+      return res.status(400).json({ error: prismaErrorHandler(err) });
     } else {
       // Handle cases where the error is not a standard Error object (e.g., a thrown string or number)
-      return res.status(400).json({ error: toErrorString(err) });
+      return res.status(400).json({ error: prismaErrorHandler(err) });
     }
   }
 }
@@ -115,10 +141,10 @@ export async function googleLogin(req: Request, res: Response) {
   } catch (err: unknown) {
    // Safely check if the caught error is an instance of the native Error class
     if (err instanceof Error) {
-      return res.status(400).json({ error: toErrorString(err) });
+      return res.status(400).json({ error: prismaErrorHandler(err) });
     } else {
       // Handle cases where the error is not a standard Error object (e.g., a thrown string or number)
-      return res.status(400).json({ error: toErrorString(err) });
+      return res.status(400).json({ error: prismaErrorHandler(err) });
     }
   }
 }
@@ -130,10 +156,10 @@ export async function sendPhoneOTP(req: Request, res: Response) {
   } catch (err: unknown) {
    // Safely check if the caught error is an instance of the native Error class
     if (err instanceof Error) {
-      return res.status(400).json({ error: toErrorString(err) });
+      return res.status(400).json({ error: prismaErrorHandler(err) });
     } else {
       // Handle cases where the error is not a standard Error object (e.g., a thrown string or number)
-      return res.status(400).json({ error: toErrorString(err) });
+      return res.status(400).json({ error: prismaErrorHandler(err) });
     }
   }
 }
@@ -145,10 +171,10 @@ export async function verifyPhoneOTP(req: Request, res: Response) {
   } catch (err: unknown) {
    // Safely check if the caught error is an instance of the native Error class
     if (err instanceof Error) {
-      return res.status(400).json({ error: toErrorString(err) });
+      return res.status(400).json({ error: prismaErrorHandler(err) });
     } else {
       // Handle cases where the error is not a standard Error object (e.g., a thrown string or number)
-      return res.status(400).json({ error: toErrorString(err) });
+      return res.status(400).json({ error: prismaErrorHandler(err) });
     }
   }
 }
@@ -159,35 +185,22 @@ export async function updateProfile(req: Request, res: Response) {
     const email = req.body.email;
 
     if (!email) {
-      return res.status(400).json({ error: "email is required" });
+      return res.status(400).json({ error: "Email is required" });
     }
 
-    // Update user profile using service
     const updatedUser = await auth.updateUserProfileByEmail(email, req.body);
-
     return res.json({
       success: true,
       message: "Profile updated successfully",
-      // user: {
-      //   id: updatedUser.id,
-      //   email: updatedUser.email,
-      //   firstName: updatedUser.firstName,
-      //   lastName: updatedUser.lastName,
-      //   phone: updatedUser.phone,
-      //   nin: updatedUser.nin,
-      //   avatar: updatedUser.avatar,
-      // },
-      user:updatedUser
+      user: updatedUser,
     });
 
-  } catch (err: unknown) {
-    if (err instanceof Error) {
-      return  res.status(400).json({ error: toErrorString(err) });
-    } else {
-      return  res.status(400).json({ error: toErrorString(err) });
-    }
+  } catch (err: any) {
+    const friendlyMessage = prismaErrorHandler(err);
+    return res.status(400).json({ error: friendlyMessage });
   }
 }
+
 
 
 

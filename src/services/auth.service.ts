@@ -23,9 +23,14 @@ interface LoginUserData {
 }
 
 // REGISTER USER
-export async function register(data: { email: string }) {
+export async function register(data: { email: string,phone?: string }) {
   const exists = await prisma.user.findUnique({ where: { email: data.email }});
   if (exists) throw new Error("Email already registered");
+  if(data.phone) {
+    const existsPhone = await prisma.user.findUnique({ where: { phone: data.phone }});
+    if (existsPhone) throw new Error("Phone number used by another user");
+
+  }
 
   const otp = generateOTP();
 
@@ -77,14 +82,26 @@ export async function resendEmailOTP(data: { email: string }) {
       otpExpiresAt: otpExpiry(),
     }
   });
-
-  await sendEmailOTP(data.email, newOTP);
-
-  return {
-    success: true,
-    message: "New OTP sent",
-    user: updatedUser,
-  };
+   
+  try {
+    
+    let resp = await sendEmailOTP(data.email, newOTP);
+    console.log("email sent");
+     console.log(resp);
+  
+    return {
+      success: true,
+      message: "New OTP sent",
+      user: updatedUser,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: error,
+      user: {},
+    };
+    
+  }
 }
 
 
@@ -175,7 +192,7 @@ export async function verifyLoginOTP(email: string, otp: string) {
 
 export async function updateUserProfileByEmail(email: string, data: any) {
   const updateData: any = {};
-
+    console.log(email,data);
   // Update only provided fields
   if (data.firstName !== undefined) updateData.firstName = data.firstName;
   if (data.lastName !== undefined) updateData.lastName = data.lastName;
@@ -191,7 +208,7 @@ export async function updateUserProfileByEmail(email: string, data: any) {
    
     updateData.avatar = upload.secure_url;
     } catch (error) {
-      console.log(error)
+       throw error; // pass error to controller
     }
   }
 

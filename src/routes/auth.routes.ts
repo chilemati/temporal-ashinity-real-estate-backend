@@ -335,6 +335,7 @@ router.post("/verify-phone-otp", verifyPhoneOTPValidationRules, validate, auth.v
  */
 router.put("/update-profile", updateProfileValidationRules, validate, auth.updateProfile);
 
+router.post("/email_phone-availability",  auth.emailPhoneAvailability);
 
 
 
