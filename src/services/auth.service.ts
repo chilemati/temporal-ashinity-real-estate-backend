@@ -86,8 +86,7 @@ export async function resendEmailOTP(data: { email: string }) {
   try {
     
     let resp = await sendEmailOTP(data.email, newOTP);
-    console.log("email sent");
-     console.log(resp);
+   
   
     return {
       success: true,
@@ -244,7 +243,6 @@ export async function handleForgotPassword(email: string) {
   
       try {
           await sendEmailOTP(email, otp);
-          // console.log(`Email sent successfully to ${email}`);
       } catch (emailError) {
           // console.error("FAILED TO SEND EMAIL OTP:", emailError); // THIS LOG IS KEY
           throw new Error("Failed to send verification email. Please try again later.");

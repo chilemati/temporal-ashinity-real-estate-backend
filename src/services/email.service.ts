@@ -39,7 +39,6 @@ export async function sendEmailOTP(to: string, otp: string) {
       }
     );
 
-    // console.log("📧 OTP email sent:", response.data);
     return response.data;
   } catch (error: any) {
     console.error("❌ Email sending failed:", error.response?.data || error.message);
