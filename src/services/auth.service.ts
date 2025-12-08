@@ -192,7 +192,6 @@ export async function verifyLoginOTP(email: string, otp: string) {
 
 export async function updateUserProfileByEmail(email: string, data: any) {
   const updateData: any = {};
-    console.log(email,data);
   // Update only provided fields
   if (data.firstName !== undefined) updateData.firstName = data.firstName;
   if (data.lastName !== undefined) updateData.lastName = data.lastName;
