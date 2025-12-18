@@ -6,8 +6,6 @@ import { sendEmailOTP } from "./email.service";
 import { sendSMSOTP } from "./sms.service";
 import cloudinary from "../utils/cloudinary";
 
-
-
 // Define interfaces for expected input data
 interface RegisterUserData {
   email: string;
@@ -23,13 +21,14 @@ interface LoginUserData {
 }
 
 // REGISTER USER
-export async function register(data: { email: string,phone?: string }) {
-  const exists = await prisma.user.findUnique({ where: { email: data.email }});
+export async function register(data: { email: string; phone?: string }) {
+  const exists = await prisma.user.findUnique({ where: { email: data.email } });
   if (exists) throw new Error("Email already registered");
-  if(data.phone) {
-    const existsPhone = await prisma.user.findUnique({ where: { phone: data.phone }});
+  if (data.phone) {
+    const existsPhone = await prisma.user.findUnique({
+      where: { phone: data.phone },
+    });
     if (existsPhone) throw new Error("Phone number used by another user");
-
   }
 
   const otp = generateOTP();
@@ -38,8 +37,8 @@ export async function register(data: { email: string,phone?: string }) {
     data: {
       email: data.email,
       emailOTP: otp,
-      otpExpiresAt: otpExpiry()
-    }
+      otpExpiresAt: otpExpiry(),
+    },
   });
 
   await sendEmailOTP(data.email, otp);
@@ -47,7 +46,7 @@ export async function register(data: { email: string,phone?: string }) {
   return {
     success: true,
     message: "OTP sent for verification",
-    user
+    user,
   };
 }
 
@@ -80,14 +79,12 @@ export async function resendEmailOTP(data: { email: string }) {
     data: {
       emailOTP: newOTP,
       otpExpiresAt: otpExpiry(),
-    }
+    },
   });
-   
+
   try {
-    
     let resp = await sendEmailOTP(data.email, newOTP);
-   
-  
+
     return {
       success: true,
       message: "New OTP sent",
@@ -99,15 +96,12 @@ export async function resendEmailOTP(data: { email: string }) {
       message: error,
       user: {},
     };
-    
   }
 }
 
-
-
 // LOGIN USER
 export async function loginSevice(data: { email: string; password?: string }) {
-  const user = await prisma.user.findUnique({ where: { email: data.email }});
+  const user = await prisma.user.findUnique({ where: { email: data.email } });
 
   if (!user) throw new Error("User not found");
 
@@ -115,7 +109,9 @@ export async function loginSevice(data: { email: string; password?: string }) {
   if (data.password) {
     if (!user.password) {
       // User does not have a password
-      throw new Error("This account does not use password login. Use OTP login.");
+      throw new Error(
+        "This account does not use password login. Use OTP login."
+      );
     }
 
     const valid = await comparePassword(data.password, user.password);
@@ -130,7 +126,7 @@ export async function loginSevice(data: { email: string; password?: string }) {
       success: true,
       type: "password_login",
       token,
-      user
+      user,
     };
   }
 
@@ -141,8 +137,8 @@ export async function loginSevice(data: { email: string; password?: string }) {
     where: { email: data.email },
     data: {
       emailOTP: otp,
-      otpExpiresAt: otpExpiry()
-    }
+      otpExpiresAt: otpExpiry(),
+    },
   });
 
   // Send OTP email
@@ -151,42 +147,61 @@ export async function loginSevice(data: { email: string; password?: string }) {
   return {
     success: true,
     type: "otp_sent",
-    message: "OTP sent to email for login"
+    message: "OTP sent to email for login",
   };
 }
 
-
-
 // VERIFY EMAIL OTP
+
 export async function verifyLoginOTP(email: string, otp: string) {
-  const user = await prisma.user.findUnique({ where: { email }});
-  if (!user) throw new Error("User not found");
-
-  if (user.emailOTP !== otp) throw new Error("Invalid OTP");
-  if (user.otpExpiresAt! < new Date()) throw new Error("OTP expired");
-
-  // Mark email verified if not already
-  const updatedUser = await prisma.user.update({
+  const user = await prisma.user.findUnique({
     where: { email },
-    data: {
-      emailVerified: true,
-      emailOTP: null,
-      otpExpiresAt: null
-    }
+    include: { wallet: true }, // 👈 important
   });
 
-  const token = signToken({ id: updatedUser.id });
+  if (!user) throw new Error("User not found");
+  if (user.emailOTP !== otp) throw new Error("Invalid OTP");
+  if (!user.otpExpiresAt || user.otpExpiresAt < new Date()) {
+    throw new Error("OTP expired");
+  }
 
+  // 🔐 Atomic operation
+  const updatedUser = await prisma.$transaction(async (tx) => {
+    const verifiedUser = await tx.user.update({
+      where: { email },
+      data: {
+        emailVerified: true,
+        emailOTP: null,
+        otpExpiresAt: null,
+      },
+    });
+
+    // ✅ Create wallet ONLY if it doesn't exist
+    if (!user.wallet) {
+      await tx.wallet.create({
+        data: {
+          userId: verifiedUser.id,
+          balance: 0,
+          currency: "NGN",
+        },
+      });
+    }
+
+    return verifiedUser;
+  });
+
+  const token = signToken({
+    id: updatedUser.id,
+    role: updatedUser.role,
+  });
+
+  // 🔁 RETURN SHAPE UNCHANGED
   return {
     type: "otp_login",
     token,
-    user: updatedUser
+    user: updatedUser,
   };
 }
-
-
-
-
 
 
 export async function updateUserProfileByEmail(email: string, data: any) {
@@ -201,12 +216,12 @@ export async function updateUserProfileByEmail(email: string, data: any) {
   if (data.avatar) {
     try {
       const upload = await cloudinary.uploader.upload(data.avatar, {
-      folder: "users-ashinity",
-    });
-   
-    updateData.avatar = upload.secure_url;
+        folder: "users-ashinity",
+      });
+
+      updateData.avatar = upload.secure_url;
     } catch (error) {
-       throw error; // pass error to controller
+      throw error; // pass error to controller
     }
   }
 
@@ -217,47 +232,47 @@ export async function updateUserProfileByEmail(email: string, data: any) {
   });
 }
 
-
-
-
-
-
 // FORGOT PASSWORD → SEND OTP
 export async function handleForgotPassword(email: string) {
-  const user = await prisma.user.findUnique({ where: { email }});
+  const user = await prisma.user.findUnique({ where: { email } });
   if (!user) throw new Error("User not found");
 
-  if(user.password === null || user.password === "" || user.password === undefined) {
-    return {status: false, message: "User has only OTP login"}
-  }else{
-
+  if (
+    user.password === null ||
+    user.password === "" ||
+    user.password === undefined
+  ) {
+    return { status: false, message: "User has only OTP login" };
+  } else {
     const otp = generateOTP();
-  
+
     await prisma.user.update({
       where: { email },
       data: {
         emailOTP: otp,
-        otpExpiresAt: otpExpiry()
-      }
+        otpExpiresAt: otpExpiry(),
+      },
     });
-  
-      try {
-          await sendEmailOTP(email, otp);
-      } catch (emailError) {
-          // console.error("FAILED TO SEND EMAIL OTP:", emailError); // THIS LOG IS KEY
-          throw new Error("Failed to send verification email. Please try again later.");
-      }
-      return {status: true, message: "OTP sent to your email"}
+
+    try {
+      await sendEmailOTP(email, otp);
+    } catch (emailError) {
+      // console.error("FAILED TO SEND EMAIL OTP:", emailError); // THIS LOG IS KEY
+      throw new Error(
+        "Failed to send verification email. Please try again later."
+      );
+    }
+    return { status: true, message: "OTP sent to your email" };
   }
-
-
 }
 
-
-
 // RESET PASSWORD
-export async function resetPassword(email: string, otp: string, newPass: string) {
-  const user = await prisma.user.findUnique({ where: { email }});
+export async function resetPassword(
+  email: string,
+  otp: string,
+  newPass: string
+) {
+  const user = await prisma.user.findUnique({ where: { email } });
   if (!user) throw new Error("User not found");
 
   if (user.emailOTP !== otp) throw new Error("Invalid OTP");
@@ -270,15 +285,18 @@ export async function resetPassword(email: string, otp: string, newPass: string)
     data: {
       password: hashed,
       emailOTP: null,
-      otpExpiresAt: null
-    }
+      otpExpiresAt: null,
+    },
   });
 }
 
-
 // LOGIN WITH GOOGLE
-export async function loginWithGoogle(googleId: string, email: string, fullname: string) {
-  let user = await prisma.user.findUnique({ where: { googleId }});
+export async function loginWithGoogle(
+  googleId: string,
+  email: string,
+  fullname: string
+) {
+  let user = await prisma.user.findUnique({ where: { googleId } });
 
   const [firstName, ...rest] = fullname.split(" ");
   const lastName = rest.join(" ") || "";
@@ -292,16 +310,14 @@ export async function loginWithGoogle(googleId: string, email: string, fullname:
         email,
         firstName,
         lastName,
-        emailVerified: true
-      }
+        emailVerified: true,
+      },
     });
   }
 
   const token = signToken({ id: user.id });
   return { token, user };
 }
-
-
 
 // SEND PHONE OTP (SMS)
 export async function sendPhoneOTP(userId: string, phone: string) {
@@ -312,8 +328,8 @@ export async function sendPhoneOTP(userId: string, phone: string) {
     data: {
       phone,
       phoneOTP: otp,
-      otpExpiresAt: otpExpiry()
-    }
+      otpExpiresAt: otpExpiry(),
+    },
   });
 
   // SEND SMS USING TWILIO
@@ -322,10 +338,9 @@ export async function sendPhoneOTP(userId: string, phone: string) {
   return true;
 }
 
-
 // VERIFY PHONE OTP
 export async function verifyPhoneOTP(userId: string, otp: string) {
-  const user = await prisma.user.findUnique({ where: { id: Number(userId) }});
+  const user = await prisma.user.findUnique({ where: { id: Number(userId) } });
   if (!user) throw new Error("User not found");
 
   if (user.phoneOTP !== otp) throw new Error("Invalid OTP");
@@ -336,7 +351,7 @@ export async function verifyPhoneOTP(userId: string, otp: string) {
     data: {
       phoneVerified: true,
       phoneOTP: null,
-      otpExpiresAt: null
-    }
+      otpExpiresAt: null,
+    },
   });
 }

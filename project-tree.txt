@@ -1,0 +1,57 @@
+.
+├── package.json
+├── package-lock.json
+├── postgrest.conf
+├── prisma
+│   ├── migrations
+│   │   ├── 20251114193544_init
+│   │   │   └── migration.sql
+│   │   ├── 20251120111234_add_firstname_lastname
+│   │   │   └── migration.sql
+│   │   ├── 20251214195324_add_user_role_and_property
+│   │   │   └── migration.sql
+│   │   └── migration_lock.toml
+│   └── schema.prisma
+├── project-tree.txt
+├── README.md
+├── src
+│   ├── app.ts
+│   ├── controllers
+│   │   ├── auth.controller.ts
+│   │   ├── kyc.controller.ts
+│   │   └── property.controller.ts
+│   ├── middleware
+│   │   ├── auth.middleware.ts
+│   │   ├── property.validation.ts
+│   │   └── validate.ts
+│   ├── models
+│   │   └── user.model.ts
+│   ├── prismaClient.ts
+│   ├── routes
+│   │   ├── auth.routes.ts
+│   │   ├── kyc.routes.ts
+│   │   └── property.routes.ts
+│   ├── server.ts
+│   ├── services
+│   │   ├── auth.service.ts
+│   │   ├── email.service.ts
+│   │   ├── kyc.service.ts
+│   │   ├── property.service.ts
+│   │   └── sms.service.ts
+│   ├── strategies
+│   │   └── google.strategy.ts
+│   ├── @types
+│   │   └── express
+│   │       └── index.d.ts
+│   ├── types
+│   │   └── multer.d.ts
+│   └── utils
+│       ├── cloudinary.ts
+│       ├── err.ts
+│       ├── jwt.ts
+│       ├── otp.ts
+│       ├── password.ts
+│       └── prisimErrorHandler.ts
+└── tsconfig.json
+
+17 directories, 38 files

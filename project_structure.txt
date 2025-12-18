@@ -1,0 +1,75 @@
+.
+├── .env
+├── .env.example
+├── .gitignore
+├── package.json
+├── package-lock.json
+├── postgrest.conf
+├── prisma
+│   ├── migrations
+│   │   ├── 20251114193544_init
+│   │   │   └── migration.sql
+│   │   ├── 20251120111234_add_firstname_lastname
+│   │   │   └── migration.sql
+│   │   ├── 20251214195324_add_user_role_and_property
+│   │   │   └── migration.sql
+│   │   ├── 20251215081416_add_roles_enum
+│   │   │   └── migration.sql
+│   │   ├── 20251215150120_reset_property_structure
+│   │   │   └── migration.sql
+│   │   └── migration_lock.toml
+│   ├── schema.prisma
+│   └── seed.ts
+├── project_structure.txt
+├── project-tree.txt
+├── README.md
+├── scripts
+│   ├── generate-swagger.sh
+│   └── swagger-generator.ts
+├── src
+│   ├── app.ts
+│   ├── controllers
+│   │   ├── admin.controller.ts
+│   │   ├── auth.controller.ts
+│   │   ├── kyc.controller.ts
+│   │   └── property.controller.ts
+│   ├── docs
+│   │   └── generated-swagger.json
+│   ├── middleware
+│   │   ├── auth.middleware.ts
+│   │   ├── property.validation.ts
+│   │   ├── roleGuard.ts
+│   │   └── validate.ts
+│   ├── models
+│   │   └── user.model.ts
+│   ├── prismaClient.ts
+│   ├── routes
+│   │   ├── admin.routes.ts
+│   │   ├── auth.routes.ts
+│   │   ├── kyc.routes.ts
+│   │   └── property.routes.ts
+│   ├── server.ts
+│   ├── services
+│   │   ├── admin.service.ts
+│   │   ├── auth.service.ts
+│   │   ├── email.service.ts
+│   │   ├── kyc.service.ts
+│   │   ├── property.service.ts
+│   │   └── sms.service.ts
+│   ├── strategies
+│   │   └── google.strategy.ts
+│   ├── @types
+│   │   └── express
+│   │       └── index.d.ts
+│   ├── types
+│   │   └── multer.d.ts
+│   └── utils
+│       ├── cloudinary.ts
+│       ├── err.ts
+│       ├── jwt.ts
+│       ├── otp.ts
+│       ├── password.ts
+│       └── prisimErrorHandler.ts
+└── tsconfig.json
+
+21 directories, 52 files

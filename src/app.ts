@@ -3,8 +3,11 @@ import cors from "cors";
 import passport from "passport";
 import "./strategies/google.strategy";
 import authRoutes from "./routes/auth.routes";
+import adminRoutes from "./routes/admin.routes";
+import propertyRoutes from "./routes/property.routes";
 import swaggerUi from "swagger-ui-express";
 import swaggerJsdoc from "swagger-jsdoc";
+import routerWallet from "./routes/wallet.routes";
 
 const app = express();
 
@@ -21,6 +24,11 @@ app.use(passport.initialize());
 
 // Routes
 app.use("/api/auth", authRoutes);
+app.use("/api/properties", propertyRoutes);
+
+app.use("/api/admin", adminRoutes);
+app.use("/api/", routerWallet);
+
 
 // Swagger setup
 const swaggerOptions = {
@@ -31,10 +39,11 @@ const swaggerOptions = {
       version: "1.0.0",
     },
   },
-  apis: ["./src/routes/*.ts"], // Point to your route files
+  apis: ["./src/routes/*.ts", "./src/docs/*.ts"],
 };
 
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
 app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 
 export default app;

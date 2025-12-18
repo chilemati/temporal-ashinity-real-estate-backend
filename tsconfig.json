@@ -7,6 +7,10 @@
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "typeRoots": ["./src/types", "./node_modules/@types"]
-  }
+    // Update the path here to match where your declaration file is located
+    // If you used src/@types/express/index.d.ts, use src/@types
+    "typeRoots": ["./node_modules/@types", "./src/@types"] 
+  },
+  // Explicitly tell TypeScript to include everything in the src directory for compilation and type checking
+  "include": ["src/**/*"] 
 }
